@@ -1,4 +1,4 @@
-import { axios } from "axios";
+import axios from "axios";
 import React, { useState } from "react";
 
 // önerilen başlangıç stateleri
@@ -69,15 +69,14 @@ export default function AppFunctional(props) {
   function ilerle(evt) {
     // Bu event handler, "B" için yeni bir dizin elde etmek üzere yukarıdaki yardımcıyı kullanabilir,
     // ve buna göre state i değiştirir.
-
+    setMessage(initialMessage);
     const yon = evt.target.id;
     const newIndex = sonrakiIndex(yon);
     let currentSteps = index !== newIndex ? steps + 1 : steps;
     if (index === newIndex) {
       const yonMessage = `${yon} tarafa gidemezsin `;
       setMessage(yonMessage);
-      setInterval(() => setMessage("Bru Grid iftiharla sunar"), 5000);
-      // Ask! Burda bi kac ilerlettikten sonra direk bu yaziya donuyor, bunu sor.
+      setTimeout(() => setMessage("Bru Grid iftiharla sunar"), 1000);
     }
     setSteps(currentSteps);
     setIndex(newIndex);
@@ -94,21 +93,19 @@ export default function AppFunctional(props) {
     console.log("submit edildi");
     let { xIndex, yIndex } = getXY();
     const payload = {
-      xIndex: xIndex,
-      yIndex: yIndex,
+      x: xIndex,
+      y: yIndex,
       email: email,
       steps: steps,
     };
 
     axios
       .post("http://localhost:9000/api/result", payload)
-      .then(function (response) {
-        console.dog(response.data);
-        setMessage(response.data.message);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+      .then((response) => setMessage(response.data.message))
+      .catch((err) => setMessage(err.response.data.message));
+
+    setEmail(initialEmail);
+    setMessage("Bru kazandi");
   }
 
   return (
@@ -150,6 +147,7 @@ export default function AppFunctional(props) {
           id="email"
           type="email"
           placeholder="email girin"
+          value={email}
         ></input>
         <input id="submit" type="submit"></input>
       </form>
